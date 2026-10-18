@@ -706,7 +706,7 @@ class PyriteCLIGroup(TyperGroup):
     def _invoke(self, ctx):
         from ..cli.outcome import Outcome
         from ..cli.output import BODY_GUARD_META_KEY
-        from ..exceptions import ConfigSaveRefusedError
+        from ..exceptions import ConfigSaveRefusedError, StorageError
 
         if BODY_GUARD_META_KEY in ctx.meta:
             # A PyriteCLIGroup mounted under another: the outer one decides.
@@ -721,6 +721,8 @@ class PyriteCLIGroup(TyperGroup):
             if not guard.entered:
                 if isinstance(exc, ConfigSaveRefusedError):
                     cli_error(str(exc), error_code="CONFIG_SAVE_REFUSED")
+                if isinstance(exc, StorageError):
+                    cli_error_from(exc, _format_in(_ARGV.get()))
                 raise
             raised = exc
 
